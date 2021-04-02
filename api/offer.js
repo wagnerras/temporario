@@ -23,11 +23,12 @@ module.exports = app => {
     }
 
     async function get(req, res) {
-        
+
         await setState()
-   
+
         app.db('offers')
             .select('id', 'advertiser_name', 'description', 'url', 'starts_at', 'ends_at', "state")
+            .orderBy('id', 'desc')
             .then(offers => res.json(offers))
             .catch(err => res.status(500).send(err))
     }
@@ -65,20 +66,36 @@ module.exports = app => {
 
     }
 
+    function disable(req, res) {
+        app.db('offers')
+            .where({ id: req.params.id })
+            .update({
+                disabled_by_adm: true,
+                state: 'disabled'
+            })
+            .then(_ => res.status(204).send())
+            .catch(err => res.status(500).send(err))
+
+    }
+
     async function setState() {
+
 
         const date = dataHoraAtual();
 
         await app.db('offers')
-            .where('starts_at', '<=', date)
-            .orWhereNull('ends_at')
+            .where('disabled_by_adm', false)
+            .andWhere(function () {
+                this.where('ends_at', '<=', date).orWhere('ends_at', null)
+            })
             .update({
                 state: 'enabled',
             })
 
 
         await app.db('offers')
-            .where('ends_at', '<=', date)
+            .where('disabled_by_adm', false)
+            .andWhere('ends_at', '<=', date)
             .update({
                 state: 'disabled',
             })
@@ -127,5 +144,5 @@ module.exports = app => {
 
 
 
-    return { save, get, getById, update, remove, setState }
+    return { save, get, getById, update, remove, setState, disable }
 }
