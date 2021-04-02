@@ -93,7 +93,6 @@ module.exports = app => {
 
     async function setState() {
 
-
         const date = dataHoraAtual();
 
         await app.db('offers')
@@ -112,7 +111,6 @@ module.exports = app => {
             .update({
                 state: 'disabled',
             })
-
 
     }
 
