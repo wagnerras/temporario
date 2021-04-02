@@ -1,0 +1,10 @@
+module.exports = {
+    authSecret: 'hahsuad4545Wgdfg24545@isikfd',
+    db: {
+        host: '127.0.0.1',
+        port: 5432,
+        database: 'lemoney',
+        user: 'postgres',
+        password: '123456'
+    }
+}
